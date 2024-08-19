@@ -1,12 +1,10 @@
-#Procedure of creating VPC in AWS
-#Create VPC
-#Create IGW
-#Associate IGW with VPC
-#Create subnet
-#Create default route table
-#Associate public subent with IGW
-#--------------------------------#
-
+data "aws_availability_zones" "ava" {
+    state = "available"
+    filter {
+      name = "zone-type"
+      values = ["availability-zone"]
+    }
+}
 //Create VPC
 resource "aws_vpc" "dev-vpc-01" {
     tags = {
@@ -28,37 +26,7 @@ resource "aws_internet_gateway_attachment" "dev-igw-vpc" {
     vpc_id = aws_vpc.dev-vpc-01.id
 }
 
-//Create public subnet 1
-resource "aws_subnet" "dev-pub-subnet-1" {
-    vpc_id = aws_vpc.dev-vpc-01.id
-    availability_zone = "ap-southeast-1a"
-    cidr_block = "10.0.1.0/24"
-    tags = {
-        Name = var.pub1_name
-    }
-}
-
-//Create public subnet 2
-resource "aws_subnet" "dev-pub-subent-2" {
-    vpc_id = aws_vpc.dev-vpc-01.id
-    availability_zone = "ap-southeast-1b"
-    cidr_block = "10.0.2.0/24"
-    tags = {
-        Name = var.pub2_name
-    }
-}
-
-//Create public subnet 3
-resource "aws_subnet" "dev-pub-subnet-3" {
-    vpc_id = aws_vpc.dev-vpc-01.id
-    availability_zone = "ap-southeast-1c"
-    cidr_block = "10.0.3.0/24"
-    tags = {
-        Name = var.pub3_name
-    }  
-}
-
-//Create route table
+//Create Public Route Table
 resource "aws_route_table" "dev-pub-rtb" {
     vpc_id = aws_vpc.dev-vpc-01.id
 
@@ -69,4 +37,31 @@ resource "aws_route_table" "dev-pub-rtb" {
     tags = {
         Name = var.pub_rtb
     }
+}
+
+//Create Private Route Table
+resource "aws_route_table" "dev-priv-rtb" {
+    vpc_id = aws_vpc.dev-vpc-01.id
+
+    route {
+        cidr_block = "10.0.0.0/18"
+        gateway_id = "local"
+    }
+    tags = {
+        Name = var.priv_rtb
+    }
+}
+
+//Associate public subnet with public route table
+resource "aws_route_table_association" "pub-subnet-to-pub-rtb" {
+    count = length(aws_subnet.dev-public-subnet)
+    route_table_id = aws_route_table.dev-pub-rtb.id
+    subnet_id = aws_subnet.dev-public-subnet[count.index].id
+}
+
+//Associate private subnet with private route table
+resource "aws_route_table_association" "private-subnet-to-private-rtb" {
+    count = length(aws_subnet.dev-private-subnet)
+    route_table_id = aws_route_table.dev-priv-rtb.id
+    subnet_id = aws_subnet.dev-private-subnet[count.index].id
 }
