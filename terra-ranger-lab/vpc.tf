@@ -13,3 +13,14 @@ resource "aws_vpc" "dev-vpc-01" {
     }
     cidr_block = "10.0.0.0/24"    
 }
+
+resource "aws_internet_gateway" "dev-igw" {
+    tags = {
+        Name = "dev-igw"
+    }
+}
+
+resource "aws_internet_gateway_attachment" "dev-igw-vpc" {
+    internet_gateway_id = aws_internet_gateway.dev-igw.id
+    vpc_id = aws_vpc.dev-vpc-01.id
+}
