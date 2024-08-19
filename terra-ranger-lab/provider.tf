@@ -9,4 +9,5 @@ terraform {
 
 provider "aws" {
     profile = "fsl"
+    region = "ap-southeast-1"
 }
