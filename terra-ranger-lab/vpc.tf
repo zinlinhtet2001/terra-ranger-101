@@ -10,7 +10,7 @@
 //Create VPC
 resource "aws_vpc" "dev-vpc-01" {
     tags = {
-        Name = "dev-vpc-01"
+        Name = var.vpc_name
     }
     cidr_block = "10.0.0.0/18"    
 }
@@ -18,7 +18,7 @@ resource "aws_vpc" "dev-vpc-01" {
 //Create Internet Gateway
 resource "aws_internet_gateway" "dev-igw" {
     tags = {
-        Name = "dev-igw"
+        Name = var.igw_name
     }
 }
 
@@ -34,7 +34,7 @@ resource "aws_subnet" "dev-pub-subnet-1" {
     availability_zone = "ap-southeast-1a"
     cidr_block = "10.0.1.0/24"
     tags = {
-        Name = "dev-pub-subnet-1"
+        Name = var.pub1_name
     }
 }
 
@@ -44,7 +44,7 @@ resource "aws_subnet" "dev-pub-subent-2" {
     availability_zone = "ap-southeast-1b"
     cidr_block = "10.0.2.0/24"
     tags = {
-        Name = "dev-pub-subnet-2"
+        Name = var.pub2_name
     }
 }
 
@@ -54,7 +54,7 @@ resource "aws_subnet" "dev-pub-subnet-3" {
     availability_zone = "ap-southeast-1c"
     cidr_block = "10.0.3.0/24"
     tags = {
-        Name = "dev-pub-subnet-3" 
+        Name = var.pub3_name
     }  
 }
 
@@ -67,6 +67,6 @@ resource "aws_route_table" "dev-pub-rtb" {
         gateway_id = aws_internet_gateway.dev-igw.id
     }
     tags = {
-        Name = "dev-pub-rtb"
+        Name = var.pub_rtb
     }
 }
